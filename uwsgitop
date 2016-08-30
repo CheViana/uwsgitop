@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 
 import socket
-try:
-    import simplejson as json
-except ImportError:
-    import json
+import json
 import curses
 import time
 import atexit
@@ -12,6 +9,7 @@ import sys
 import traceback
 from collections import defaultdict
 import errno
+import requests
 
 need_reset = True
 screen = None
@@ -67,6 +65,8 @@ def abstract_unix_addr(arg):
     return sfamily, addr, socket.gethostname()
 
 addr = sys.argv[1]
+http_addr = sys.argv[1]
+
 if ':' in addr:
     sfamily, addr, host = inet_addr(addr)
 elif addr.startswith('@'):
@@ -151,25 +151,9 @@ while True:
 
     screen.clear()
 
-    js = ''
+    response = requests.get(http_addr)
 
-    try:
-        s = socket.socket(sfamily, socket.SOCK_STREAM)
-        s.connect(addr)
-
-        while True:
-            data = s.recv(4096)
-            if len(data) < 1:
-                break
-            js += data.decode('utf8')
-    except IOError as e:
-        if e.errno != errno.EINTR:
-            raise
-        continue
-    except:
-        raise Exception("unable to get uWSGI statistics")
-
-    dd = json.loads(js)
+    dd = response.json()
 
     uversion = ''
     if 'version' in dd:
@@ -310,7 +294,7 @@ while True:
 
     screen.refresh()
 
-    s.close()
+    # s.close()
     ch = screen.getch()
     if ch == ord('q'):
         game_over()

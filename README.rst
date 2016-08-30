@@ -1,3 +1,13 @@
+Cheviana's fork of ``uwsgitop``, that works only with http web address, but correctly and encoding-agnostic.
+Created b/c bug https://github.com/xrmx/uwsgitop/issues/4 doesn't seem to be fixed (there's still ``decode('utf-8')`` in code).
+
+Example:
+
+    uwsgitop http://example.com:5050
+
+
+Original readme:
+
 uwsgitop
 ========
 
